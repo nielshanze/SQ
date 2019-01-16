@@ -37,7 +37,7 @@ public class Runner {
 			Bus bus = itr.next();
 			boolean eindpuntBereikt = bus.move();
 			if (eindpuntBereikt) {
-				bus.sendLastETA(nu);
+				MessageBroker.getInstance().sendLastETA(nu, bus);
 				itr.remove();
 			}
 		}		
@@ -47,11 +47,11 @@ public class Runner {
 		Iterator<Bus> itr = actieveBussen.iterator();
 		while (itr.hasNext()) {
 			Bus bus = itr.next();
-			bus.sendETAs(nu);
+			MessageBroker.getInstance().sendETAs(nu, bus);
 		}				
 	}
 	
-	public static int initBussen(){
+	public static void initBussen(){
 		Bus bus1=new Bus(Lijnen.LIJN1, Bedrijven.ARRIVA, 1);
 		Bus bus2=new Bus(Lijnen.LIJN2, Bedrijven.ARRIVA, 1);
 		Bus bus3=new Bus(Lijnen.LIJN3, Bedrijven.ARRIVA, 1);
@@ -92,12 +92,16 @@ public class Runner {
 		addBus(6, bus18);	
 		addBus(12, bus19); 
 		addBus(10, bus20);	
+	}
+	
+	private static int getBusWithLowestKey() {
 		return Collections.min(busStart.keySet());
 	}
 
 	public static void main(String[] args) throws InterruptedException {
 		int tijd=0;
-		int volgende = initBussen();
+		initBussen();
+		int volgende = getBusWithLowestKey();
 		while ((volgende>=0) || !actieveBussen.isEmpty()) {
 			System.out.println("De tijd is:" + tijd);
 			volgende = (tijd==volgende) ? startBussen(tijd) : volgende;
